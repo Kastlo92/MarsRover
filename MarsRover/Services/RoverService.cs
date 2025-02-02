@@ -11,10 +11,15 @@ namespace MarsRover.Service
         private readonly Rover _rover;
         private float maxX = 10f;
         private float maxY = 10f;
-
+        private HashSet<(float X, float Y)> _obstacles;
         public RoverService(Rover rover)
         {
             _rover = rover;
+            _obstacles = new HashSet<(float, float)>
+            {
+                (2,3),
+                (4,1)
+            };
         }
         public Rover GetRover() => _rover;
 
@@ -51,25 +56,39 @@ namespace MarsRover.Service
         private void MoveFB(Direction direction, bool forward = true)
         {
             var speed = 1 * (forward ? 1 : -1);
-                switch (direction)
-                {
-                    case (Direction.North):
-                        _rover.Y += speed;
-                        break;
-                    case (Direction.South):
-                        _rover.Y -= speed;
-                        break;
-                    case (Direction.East):
-                        _rover.X += speed;
-                        break;
-                    case (Direction.West):
-                        _rover.X -= speed;
-                        break;
-                    default:
-                        break;
-                }
-            _rover.X = Wrapping(_rover.X, maxX);
-            _rover.Y = Wrapping(_rover.Y, maxY);
+            float nextX = _rover.X;
+            float nextY = _rover.Y;
+
+            switch (direction)
+            {
+                case (Direction.North):
+                    nextY += speed;
+                    break;
+                case (Direction.South):
+                    nextY -= speed;
+                    break;
+                case (Direction.East):
+                    nextX += speed;
+                    break;
+                case (Direction.West):
+                    nextX -= speed;
+                    break;
+                default:
+                    break;
+            }
+
+            if(!ObstacleDetection(nextX,nextY))
+            {
+                _rover.X = nextX;
+                _rover.Y = nextY;
+
+                _rover.X = Wrapping(_rover.X, maxX);
+                _rover.Y = Wrapping(_rover.Y, maxY);
+            }
+            else
+            {
+
+            }
         }
 
         private void MoveLR(Direction direction, bool turnLeft = true)
@@ -102,7 +121,9 @@ namespace MarsRover.Service
             return roverCoordinates;
         }
 
-        private void ObstacleDetection() { 
+        private bool ObstacleDetection(float xPos,float yPos)
+        {
+            return _obstacles.Contains((xPos, yPos));
         }
     }
 }
