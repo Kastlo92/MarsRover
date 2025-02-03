@@ -26,24 +26,30 @@ namespace MarsRover.Service
         public string Move(RoverMovementRequestDTO command)
         {
             if (command == null || command?.Commands == null)
-                return "Comando non riconosciuto";
+                return "Inserire comandi del Rover. Possibili comandi: f,b,l,r";
 
             foreach (var cmd in command.Commands)
             {
                 switch (cmd.ToString().ToLower())
                 {
                     case ("f"):
-                        MoveFB(_rover.Direction, true);
+                        if(!MoveFB(_rover.Direction, true))
+                            return $"Ostacolo rilevato. Ultima posizione: {_rover.X}x, {_rover.Y}y ; \n Direzione : {_rover.Direction}. \n Sequenza abortita";
                         break;
+
                     case ("b"):
-                        MoveFB(_rover.Direction, false);
+                        if(!MoveFB(_rover.Direction, false))
+                            return $"Ostacolo rilevato. Ultima posizione: {_rover.X}x, {_rover.Y}y ; \n Direzione : {_rover.Direction}. \n Sequenza abortita";
                         break;
+
                     case ("l"):
                         MoveLR(_rover.Direction, true);
                         break;
+
                     case ("r"):
                         MoveLR(_rover.Direction, false);
                         break;
+
                     default:
                         break;
                 }
@@ -53,7 +59,7 @@ namespace MarsRover.Service
 
         }
 
-        private void MoveFB(Direction direction, bool forward = true)
+        private bool MoveFB(Direction direction, bool forward = true)
         {
             var speed = 1 * (forward ? 1 : -1);
             float nextX = _rover.X;
@@ -84,11 +90,11 @@ namespace MarsRover.Service
 
                 _rover.X = Wrapping(_rover.X, maxX);
                 _rover.Y = Wrapping(_rover.Y, maxY);
-            }
-            else
-            {
 
+                return true;
             }
+
+            return false;
         }
 
         private void MoveLR(Direction direction, bool turnLeft = true)
