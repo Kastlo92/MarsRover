@@ -12,7 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<Rover>(provider => new Rover(2.0f, 1.0f, Direction.North));
+builder.Services.AddSingleton<Rover>(provider => new Rover(0.0f, 0.0f, Direction.North));
 builder.Services.AddSingleton<IRoverService, RoverService>();  
 
 var app = builder.Build();
